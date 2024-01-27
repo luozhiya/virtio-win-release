@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
-          path: sublime*.*
+          path: virtio-win*.*
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
