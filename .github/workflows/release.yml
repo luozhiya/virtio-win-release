@@ -35,7 +35,7 @@ jobs:
             # https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win-0.1.240.iso
             # win-0.1.240-1
             NUMBER_PART=$(cut -c 5- <<< $TAG_NAME)
-            ISO_PART=$(cut -c -3 <<< $NUMBER_PART)
+            ISO_PART=$(cut -c -7 <<< $NUMBER_PART)
             echo $TAG_NAME
             echo $NUMBER_PART
             echo $ISO_PART
