@@ -1,0 +1,55 @@
+name: virtio-win
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  linux:
+    strategy:
+      matrix:
+        include:
+          - ubuntu_ver: 22.04
+    runs-on: ubuntu-${{ matrix.ubuntu_ver }}
+    timeout-minutes: 45
+    if: always()
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl aria2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1  
+      - if: github.event_name == 'workflow_dispatch'
+        run: echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+      - if: github.event_name == 'push'
+        run: |
+          TAG_NAME=${{ github.ref }}
+          echo "TAG_NAME=${TAG_NAME#refs/tags/}" >> $GITHUB_ENV          
+      - name: Download virtio-win
+        run: |
+          if [[ "$TAG_NAME" == *"win"* ]]; then
+            # https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win-0.1.240.iso
+            # win-0.1.240-1
+            NUMBER_PART=$(cut -c 5- <<< $TAG_NAME)
+            ISO_PART=$(cut -c -3 <<< $NUMBER_PART)
+            echo $TAG_NAME
+            echo $NUMBER_PART
+            echo $ISO_PART
+            aria2c https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-${NUMBER_PART}/virtio-win-${ISO_PART}.iso
+          else
+          fi
+      - name: Upload 
+        uses: actions/upload-artifact@v3
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        with:
+          path: sublime*.*
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: true
+          files: virtio-win*.*
