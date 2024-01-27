@@ -41,6 +41,7 @@ jobs:
             echo $ISO_PART
             aria2c https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-${NUMBER_PART}/virtio-win-${ISO_PART}.iso
           else
+            echo "no win"
           fi
       - name: Upload 
         uses: actions/upload-artifact@v3
